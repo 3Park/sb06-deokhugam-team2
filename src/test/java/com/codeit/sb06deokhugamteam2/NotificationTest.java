@@ -109,20 +109,30 @@ public class NotificationTest {
   }
 
   @Test
-  @DisplayName("알림 일괄 읽기 성공")
+  @DisplayName("알림 일괄 읽기 성공 - batch 직접 실행")
   public void updateReadAllNotificationTest()
       throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
     JobParameters jobParameters = new JobParametersBuilder()
         .addLong("time",System.currentTimeMillis())
-        .addString("id",preSetupData.getId().toString())
         .addString("userId",preSetupData.getUserId().toString())
         .toJobParameters();
 
     jobLauncher.run(readAllNoitificationsJob,jobParameters);
 
-    Notification notification = notificationRepository.findByIdAndUserId(preSetupData.getId(),preSetupData.getUserId()).get();
+    Notification notification = notificationRepository.findByUserId(preSetupData.getUserId()).get().get(0);
     assertThat(notification).isNotNull();
     assertThat(notification.getId()).isEqualTo(preSetupData.getId());
+    assertThat(notification.getUserId()).isEqualTo(preSetupData.getUserId());
+    assertThat(notification.getConfirmedAt()).isNotEqualTo(preSetupData.getCreatedAt());
+  }
+
+  @Test
+  @DisplayName("알림 일괄 읽기 성공 - service 통해 실행")
+  public void updateAllNotificationServiceTest()
+  {
+    notificationService.updateAllReadState(preSetupData.getUserId());
+    Notification notification = notificationRepository.findByUserId(preSetupData.getUserId()).get().get(0);
+    assertThat(notification).isNotNull();
     assertThat(notification.getUserId()).isEqualTo(preSetupData.getUserId());
     assertThat(notification.getConfirmedAt()).isNotEqualTo(preSetupData.getCreatedAt());
   }

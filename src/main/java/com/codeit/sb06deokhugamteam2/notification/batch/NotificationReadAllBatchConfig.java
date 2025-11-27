@@ -44,7 +44,7 @@ public class NotificationReadAllBatchConfig {
   public Step readAllNoitificationsStep() {
     return new StepBuilder("readAllNoitificationsStep", jobRepository)
         .<Notification, Notification>chunk(100, transactionManager)
-        .reader(readAllNoitificationsItemReader(null,null))
+        .reader(readAllNoitificationsItemReader(null))
         .processor(readAllNoitificationsItemProcessor())
         .writer(writeAllNoitificationsItemWriter())
         .build();
@@ -53,7 +53,6 @@ public class NotificationReadAllBatchConfig {
   @Bean
   @StepScope
   public JpaPagingItemReader<Notification> readAllNoitificationsItemReader(
-      @Value("#{jobParameters['id']}") String id,
       @Value("#{jobParameters['userId']}") String userId
   ) {
     return new JpaPagingItemReaderBuilder<Notification>()
@@ -61,9 +60,9 @@ public class NotificationReadAllBatchConfig {
         .entityManagerFactory(entityManagerFactory)
         .queryString(
             "SELECT n FROM Notification n "
-                + "WHERE n.id = :id AND n.userId = :userId AND "
+                + "WHERE n.userId = :userId AND "
                 + " n.createdAt = n.confirmedAt")
-        .parameterValues(Map.of("id", UUID.fromString(id), "userId", UUID.fromString(userId)))
+        .parameterValues(Map.of("userId", UUID.fromString(userId)))
         .pageSize(100)
         .build();
   }

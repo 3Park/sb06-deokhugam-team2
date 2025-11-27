@@ -30,10 +30,12 @@ CREATE TABLE Comments
 
 CREATE TABLE Dashboard
 (
-  ranking_type varchar NOT NULL,
-  period_type  varchar NOT NULL,
-  score        float4  NOT NULL,
-  PRIMARY KEY (ranking_type, period_type)
+    id                     NOT NULL,
+    ranking_type varchar   NOT NULL,
+    period_type  varchar   NOT NULL,
+    score        float4    NOT NULL,
+    created_at   timestamp NOT NULL,
+    PRIMARY KEY (id)
 );
 
 COMMENT ON COLUMN Dashboard.ranking_type IS '인기도서, 인기 리뷰, 파워 유저';
