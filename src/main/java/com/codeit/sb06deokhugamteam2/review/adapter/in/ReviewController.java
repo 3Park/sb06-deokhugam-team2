@@ -47,9 +47,13 @@ public class ReviewController implements ReviewApi {
     @Override
     @GetMapping
     public ResponseEntity<CursorPageResponseReviewDto> getReviews(
-            @ModelAttribute @Valid CursorPageRequestReviewDto request,
+            @ModelAttribute
+            @Valid
+            CursorPageRequestReviewDto request,
+
             @RequestHeader(value = "Deokhugam-Request-User-ID")
-            @UUID(message = "요청 사용자 ID는 UUID 형식이어야 합니다.") String header
+            @UUID(message = "요청 사용자 ID는 UUID 형식이어야 합니다.")
+            String header
     ) {
         ReviewPaginationQuery query = reviewMapper.toReviewPaginationQuery(request, header);
         ReviewSummary summary = getReviewQuery.readReviews(query);
