@@ -31,11 +31,34 @@ public interface ReviewApi {
     @ApiResponse(responseCode = "500", description = "서버 내부 요류")
     ResponseEntity<CursorPageResponseReviewDto> getReviews(
             @ParameterObject CursorPageRequestReviewDto request,
+
             @Parameter(
+                    required = true,
                     schema = @Schema(format = "uuid"),
                     in = ParameterIn.HEADER,
+                    name = "Deokhugam-Request-User-ID",
+                    description = "요청자 ID",
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            ) String header
+    );
+
+    @Operation(summary = "리뷰 상세 정보 조회", description = "리뷰 ID로 상세 정보를 조회합니다.")
+    ResponseEntity<ReviewDto> getReview(
+            @Parameter(
                     required = true,
-                    name = "Deokhugam-Request-User-ID"
+                    schema = @Schema(format = "uuid"),
+                    in = ParameterIn.PATH,
+                    description = "리뷰 ID",
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            ) String reviewId,
+
+            @Parameter(
+                    required = true,
+                    schema = @Schema(format = "uuid"),
+                    in = ParameterIn.HEADER,
+                    name = "Deokhugam-Request-User-ID",
+                    description = "요청자 ID",
+                    example = "123e4567-e89b-12d3-a456-426614174000"
             ) String header
     );
 }
