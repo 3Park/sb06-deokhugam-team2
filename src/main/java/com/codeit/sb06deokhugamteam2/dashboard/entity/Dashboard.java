@@ -39,7 +39,7 @@ public class Dashboard {
 
     @Builder.Default
     @Column(nullable = false)
-    private Long rank = 0L;
+    private long rank = 0L;
 
     @Builder.Default
     @Column(nullable = false)

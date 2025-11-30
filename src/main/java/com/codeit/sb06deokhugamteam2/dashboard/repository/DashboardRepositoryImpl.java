@@ -57,7 +57,7 @@ public class DashboardRepositoryImpl implements DashboardRepositoryCustom {
                         direction == Sort.Direction.ASC ?
                                 dashBoard.createdAt.asc() :      // 오래된 순
                                 dashBoard.createdAt.desc()       // 최신 순
-                ).limit(limit+1L)
+                ).limit(limit + 1)
                 .fetch();
     }
 }
