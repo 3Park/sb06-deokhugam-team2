@@ -114,7 +114,7 @@ public class BookService {
 
         return bookMapper.toDto(findBook);
     }
-
+    @Transactional(readOnly = true)
     public CursorPageResponseBookDto findBooks(String keyword, String orderBy,
                                                String direction, String cursor, Instant nextAfter, int limit) {
         long totalElements =
