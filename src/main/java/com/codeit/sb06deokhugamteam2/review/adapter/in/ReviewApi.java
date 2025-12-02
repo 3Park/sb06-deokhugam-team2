@@ -1,9 +1,9 @@
 package com.codeit.sb06deokhugamteam2.review.adapter.in;
 
-import com.codeit.sb06deokhugamteam2.review.adapter.in.dto.CursorPageRequestReviewDto;
-import com.codeit.sb06deokhugamteam2.review.adapter.in.dto.CursorPageResponseReviewDto;
-import com.codeit.sb06deokhugamteam2.review.adapter.in.dto.ReviewCreateRequest;
-import com.codeit.sb06deokhugamteam2.review.adapter.in.dto.ReviewDto;
+import com.codeit.sb06deokhugamteam2.review.application.dto.CursorPageRequestReviewDto;
+import com.codeit.sb06deokhugamteam2.review.application.dto.CursorPageResponseReviewDto;
+import com.codeit.sb06deokhugamteam2.review.application.dto.ReviewCreateRequest;
+import com.codeit.sb06deokhugamteam2.review.application.dto.ReviewDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -62,7 +62,7 @@ public interface ReviewApi {
                     example = "123e4567-e89b-12d3-a456-426614174000"
             )
             @UUID(message = "리뷰 ID는 UUID 형식이어야 합니다.")
-            String review,
+            String request,
 
             @Parameter(
                     required = true,
@@ -91,7 +91,36 @@ public interface ReviewApi {
                     example = "123e4567-e89b-12d3-a456-426614174000"
             )
             @UUID(message = "리뷰 ID는 UUID 형식이어야 합니다.")
-            String review,
+            String request,
+
+            @Parameter(
+                    required = true,
+                    schema = @Schema(format = "uuid"),
+                    in = ParameterIn.HEADER,
+                    name = "Deokhugam-Request-User-ID",
+                    description = "요청자 ID",
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            )
+            @UUID(message = "요청 사용자 ID는 UUID 형식이어야 합니다.")
+            String header
+    );
+
+    @Operation(summary = "리뷰 물리 삭제", description = "본인이 작성한 리뷰를 물리적으로 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "리뷰 삭제 성공")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청 (요청자 ID 누락)")
+    @ApiResponse(responseCode = "403", description = "리뷰 삭제 권한 없음")
+    @ApiResponse(responseCode = "404", description = "리뷰 정보 없음")
+    @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    ResponseEntity<Void> hardDeleteReview(
+            @Parameter(
+                    required = true,
+                    schema = @Schema(format = "uuid"),
+                    in = ParameterIn.PATH,
+                    description = "리뷰 ID",
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            )
+            @UUID(message = "리뷰 ID는 UUID 형식이어야 합니다.")
+            String request,
 
             @Parameter(
                     required = true,
