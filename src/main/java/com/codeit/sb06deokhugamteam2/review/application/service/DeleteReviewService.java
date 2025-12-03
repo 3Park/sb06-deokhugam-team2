@@ -16,16 +16,16 @@ public class DeleteReviewService implements DeleteReviewUseCase {
     }
 
     @Override
-    public void deleteReview(String request, String header) {
-        String reviewId = request;
+    public void deleteReview(String path, String header) {
+        String reviewId = path;
         String requestUserId = header;
 
         reviewService.delete(reviewId, requestUserId);
     }
 
     @Override
-    public void hardDeleteReview(String request, String header) {
-        String reviewId = request;
+    public void hardDeleteReview(String path, String header) {
+        String reviewId = path;
         String requestUserId = header;
 
         reviewService.hardDelete(reviewId, requestUserId);

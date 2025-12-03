@@ -23,11 +23,11 @@ public class CreateReviewService implements CreateReviewUseCase {
     }
 
     @Override
-    public ReviewDto createReview(ReviewCreateRequest request) {
-        String bookId = request.bookId();
-        String userId = request.userId();
-        Integer rating = request.rating();
-        String content = request.content();
+    public ReviewDto createReview(ReviewCreateRequest requestBody) {
+        String bookId = requestBody.bookId();
+        String userId = requestBody.userId();
+        Integer rating = requestBody.rating();
+        String content = requestBody.content();
 
         ReviewDomain newReview = reviewService.create(bookId, userId, rating, content);
         return queryReviewPort.findById(newReview.id(), null)

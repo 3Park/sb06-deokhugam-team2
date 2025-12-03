@@ -32,48 +32,48 @@ public class ReviewController implements ReviewApi {
 
     @Override
     @PostMapping
-    public ResponseEntity<ReviewDto> postReview(@RequestBody ReviewCreateRequest request) {
-        ReviewDto response = createReviewUseCase.createReview(request);
+    public ResponseEntity<ReviewDto> postReview(@RequestBody ReviewCreateRequest requestBody) {
+        ReviewDto response = createReviewUseCase.createReview(requestBody);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
     @GetMapping
     public ResponseEntity<CursorPageResponseReviewDto> getReviews(
-            @ModelAttribute CursorPageRequestReviewDto request,
+            @ModelAttribute CursorPageRequestReviewDto query,
             @RequestHeader(value = "Deokhugam-Request-User-ID") String header
     ) {
-        CursorPageResponseReviewDto response = getReviewQuery.readReviews(request, header);
+        CursorPageResponseReviewDto response = getReviewQuery.readReviews(query, header);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/{reviewId}")
     public ResponseEntity<ReviewDto> getReview(
-            @PathVariable(name = "reviewId") String request,
+            @PathVariable(name = "reviewId") String path,
             @RequestHeader(value = "Deokhugam-Request-User-ID") String header
     ) {
-        ReviewDto response = getReviewQuery.readReview(request, header);
+        ReviewDto response = getReviewQuery.readReview(path, header);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(
-            @PathVariable(name = "reviewId") String request,
+            @PathVariable(name = "reviewId") String path,
             @RequestHeader(value = "Deokhugam-Request-User-ID") String header
     ) {
-        deleteReviewUseCase.deleteReview(request, header);
+        deleteReviewUseCase.deleteReview(path, header);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
     @Override
     @DeleteMapping("/{reviewId}/hard")
     public ResponseEntity<Void> hardDeleteReview(
-            @PathVariable(name = "reviewId") String request,
+            @PathVariable(name = "reviewId") String path,
             @RequestHeader(value = "Deokhugam-Request-User-ID") String header
     ) {
-        deleteReviewUseCase.hardDeleteReview(request, header);
+        deleteReviewUseCase.hardDeleteReview(path, header);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }

@@ -25,7 +25,7 @@ public interface ReviewApi {
     @ApiResponse(responseCode = "404", description = "도서 정보 없음")
     @ApiResponse(responseCode = "409", description = "이미 작성된 리뷰 존재")
     @ApiResponse(responseCode = "500", description = "서버 내부 요류")
-    ResponseEntity<ReviewDto> postReview(@RequestBody(required = true) @Valid ReviewCreateRequest request);
+    ResponseEntity<ReviewDto> postReview(@RequestBody(required = true) @Valid ReviewCreateRequest requestBody);
 
     @Operation(summary = "리뷰 목록 조회", description = "검색 조건에 맞는 리뷰 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "리뷰 목록 조회 성공")
@@ -34,7 +34,7 @@ public interface ReviewApi {
     ResponseEntity<CursorPageResponseReviewDto> getReviews(
             @ParameterObject
             @Valid
-            CursorPageRequestReviewDto request,
+            CursorPageRequestReviewDto query,
 
             @Parameter(
                     required = true,
@@ -62,7 +62,7 @@ public interface ReviewApi {
                     example = "123e4567-e89b-12d3-a456-426614174000"
             )
             @UUID(message = "리뷰 ID는 UUID 형식이어야 합니다.")
-            String request,
+            String path,
 
             @Parameter(
                     required = true,
@@ -91,7 +91,7 @@ public interface ReviewApi {
                     example = "123e4567-e89b-12d3-a456-426614174000"
             )
             @UUID(message = "리뷰 ID는 UUID 형식이어야 합니다.")
-            String request,
+            String path,
 
             @Parameter(
                     required = true,
@@ -120,7 +120,7 @@ public interface ReviewApi {
                     example = "123e4567-e89b-12d3-a456-426614174000"
             )
             @UUID(message = "리뷰 ID는 UUID 형식이어야 합니다.")
-            String request,
+            String path,
 
             @Parameter(
                     required = true,
