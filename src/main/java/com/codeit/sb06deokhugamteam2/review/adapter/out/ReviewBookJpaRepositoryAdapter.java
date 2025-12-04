@@ -1,6 +1,6 @@
 package com.codeit.sb06deokhugamteam2.review.adapter.out;
 
-import com.codeit.sb06deokhugamteam2.book.entity.Book;
+import com.codeit.sb06deokhugamteam2.book.entity.BookStats;
 import com.codeit.sb06deokhugamteam2.review.application.port.out.ReviewBookRepositoryPort;
 import com.codeit.sb06deokhugamteam2.review.domain.ReviewBookDomain;
 import jakarta.persistence.EntityManager;
@@ -20,14 +20,14 @@ public class ReviewBookJpaRepositoryAdapter implements ReviewBookRepositoryPort 
 
     @Override
     public Optional<ReviewBookDomain> findById(UUID bookId) {
-        Book bookEntity = em.find(Book.class, bookId);
-        if (bookEntity == null) {
+        BookStats bookStatsEntity = em.find(BookStats.class, bookId);
+        if (bookStatsEntity == null) {
             return Optional.empty();
         }
 
-        UUID id = bookEntity.getId();
-        int reviewCount = bookEntity.getReviewCount();
-        int ratingSum = bookEntity.getRatingSum();
+        UUID id = bookStatsEntity.getBookId();
+        int reviewCount = bookStatsEntity.getReviewCount();
+        int ratingSum = bookStatsEntity.getRatingSum();
         var book = new ReviewBookDomain(id, reviewCount, ratingSum);
 
         return Optional.of(book);
@@ -36,8 +36,8 @@ public class ReviewBookJpaRepositoryAdapter implements ReviewBookRepositoryPort 
     @Override
     @Transactional
     public void update(ReviewBookDomain book) {
-        Book bookEntity = em.find(Book.class, book.id());
-        bookEntity.setReviewCount(book.reviewCount());
-        bookEntity.setRatingSum(book.ratingSum());
+        BookStats bookStatsEntity = em.find(BookStats.class, book.id());
+        bookStatsEntity.setReviewCount(book.reviewCount());
+        bookStatsEntity.setRatingSum(book.ratingSum());
     }
 }
