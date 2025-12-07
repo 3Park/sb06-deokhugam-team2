@@ -442,7 +442,7 @@ public class BookIntegrationTest {
                 bookService.deleteSoft(bookId);     // @Retryable 적용되어 리트라이 시도됨
 
             } catch (OptimisticLockingFailureException e) {
-                System.err.println("삭제 리트라이 최종 실패: " + e.getMessage());
+                System.err.println("논리 삭제 리트라이 최종 실패: " + e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -457,5 +457,8 @@ public class BookIntegrationTest {
         // then
         Book resultBook = bookRepository.findById(bookId).orElse(null);
         assertThat(resultBook).isNull();
+
+        // cleanup
+        bookService.deleteHard(bookId);
     }
 }
