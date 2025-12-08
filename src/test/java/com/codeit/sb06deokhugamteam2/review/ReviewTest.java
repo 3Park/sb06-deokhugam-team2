@@ -1,7 +1,7 @@
 package com.codeit.sb06deokhugamteam2.review;
 
 import com.codeit.sb06deokhugamteam2.review.adapter.out.entity.Review;
-import com.codeit.sb06deokhugamteam2.review.application.dto.ReviewCreateRequest;
+import com.codeit.sb06deokhugamteam2.review.application.dto.request.ReviewCreateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +63,8 @@ class ReviewTest {
                         softly.assertThat(saved.id()).isEqualTo(UUID.fromString(id));
                         softly.assertThat(saved.rating()).isEqualTo(rating);
                         softly.assertThat(saved.content()).isEqualTo(content);
-                        softly.assertThat(saved.likeCount()).isEqualTo(0);
-                        softly.assertThat(saved.commentCount()).isEqualTo(0);
+                        softly.assertThat(saved.reviewStat().likeCount()).isEqualTo(0);
+                        softly.assertThat(saved.reviewStat().commentCount()).isEqualTo(0);
                         softly.assertThat(saved.createdAt()).isAfterOrEqualTo(now);
                         softly.assertThat(saved.updatedAt()).isEqualTo(saved.createdAt()).isAfterOrEqualTo(now);
                     });
