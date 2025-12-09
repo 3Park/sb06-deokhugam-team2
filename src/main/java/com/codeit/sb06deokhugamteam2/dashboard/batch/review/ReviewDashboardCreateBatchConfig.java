@@ -2,6 +2,7 @@ package com.codeit.sb06deokhugamteam2.dashboard.batch.review;
 
 import com.codeit.sb06deokhugamteam2.common.enums.PeriodType;
 import com.codeit.sb06deokhugamteam2.common.enums.RankingType;
+import com.codeit.sb06deokhugamteam2.dashboard.batch.listener.RankingListener;
 import com.codeit.sb06deokhugamteam2.dashboard.dto.data.ReviewReaderItemDto;
 import com.codeit.sb06deokhugamteam2.dashboard.entity.Dashboard;
 import com.codeit.sb06deokhugamteam2.dashboard.repository.DashboardRepository;
@@ -39,20 +40,21 @@ public class ReviewDashboardCreateBatchConfig {
 
     //Job 정의
     @Bean
-    public Job createPopularReviewJob() {
+    public Job createPopularReviewJob(Step createPopularReviewStep) {
         return new JobBuilder("createPopularReviewJob", jobRepository)
-                .start(createPopularReviewStep())
+                .start(createPopularReviewStep)
                 .build();
     }
 
     //Step정의
     @Bean
-    public Step createPopularReviewStep() {
+    public Step createPopularReviewStep(RankingListener rankingListener) {
         return new StepBuilder("createPopularReviewStep", jobRepository)
                 .<ReviewReaderItemDto, Dashboard>chunk(100, transactionManager)
                 .reader(createPopularReviewReader(null))
-                .processor(createPopularReviewProcessor(null))
+                .processor(createPopularReviewProcessor(null, null))
                 .writer(createPopularReviewWriter())
+                .listener(rankingListener)
                 .build();
     }
 
@@ -69,14 +71,18 @@ public class ReviewDashboardCreateBatchConfig {
                 .name("createPopularReviewReader")
                 .entityManagerFactory(entityManagerFactory)
                 .queryString("""
-                        SELECT r.id, (COUNT(lk.id) * 0.3) + (COUNT(c.id) * 0.7) as score
+                        SELECT new com.example.ReviewReaderItemDto(
+                            r.id,
+                            (COUNT(lk.id) * 0.3) + (COUNT(c.id) * 0.7)
+                        )
                         FROM Review r
                         LEFT JOIN Comment c
                         ON c.review = r
-                        WITH c.createdAT BETWEEN :startDate And :endDate
-                        LEFT JOIN r.reviewLikes lk
-                        WITH lk.likedAt as DATE BETWEEN :startDate And :endDate
-                        GROUP BY r.id, u.id, b.id
+                        AND c.createdAt BETWEEN :startDate And :endDate
+                        LEFT JOIN ReviewLike lk
+                        ON lk.review = r
+                        AND lk.likedAt BETWEEN :startDate And :endDate
+                        GROUP BY r.id
                         ORDER BY (COUNT(lk.id) * 0.3) + (COUNT(c.id) * 0.7)
                         """)
                 .parameterValues(Map.of("startDate", startDate, "endDate", endDate))
@@ -88,12 +94,12 @@ public class ReviewDashboardCreateBatchConfig {
     @Bean
     @StepScope
     public ItemProcessor<ReviewReaderItemDto, Dashboard> createPopularReviewProcessor(
-            @Value("#{jobParameters['periodType']}") PeriodType periodType
+            @Value("#{jobParameters['periodType']}") PeriodType periodType,
+            @Value("#{stepExecutionContext['rank']}") AtomicLong rank
     ) {
-        AtomicLong atomicLong =  new AtomicLong(1L);
         return popularReview ->
                 Dashboard.builder()
-                        .rank(atomicLong.getAndIncrement())
+                        .rank(rank.getAndIncrement())
                         .score(popularReview.getScore())
                         .entityId(popularReview.getReviewId())
                         .periodType(periodType)
@@ -109,7 +115,7 @@ public class ReviewDashboardCreateBatchConfig {
 
     private Instant calculateStartDate(PeriodType periodType) {
         ZoneId zoneId = ZoneId.systemDefault();
-        LocalDate startDate = switch (periodType){
+        LocalDate startDate = switch (periodType) {
             case DAILY -> LocalDate.now().minusDays(1);
             case WEEKLY -> LocalDate.now().minusDays(7);
             case MONTHLY -> LocalDate.now().minusDays(30);

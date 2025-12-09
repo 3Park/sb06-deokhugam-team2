@@ -63,7 +63,7 @@ public class ReviewDashboardScheduler {
     public void runEntireJob() {
         try {
             JobParameters params = new JobParametersBuilder()
-                    .addString("periodType", PeriodType.MONTHLY.name())
+                    .addString("periodType", PeriodType.ALL_TIME.name())
                     .addLong("time", System.currentTimeMillis())
                     .toJobParameters();
 

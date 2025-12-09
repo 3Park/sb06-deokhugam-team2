@@ -8,7 +8,7 @@ import com.codeit.sb06deokhugamteam2.dashboard.dto.data.PopularReviewDto;
 import com.codeit.sb06deokhugamteam2.dashboard.entity.Dashboard;
 import com.codeit.sb06deokhugamteam2.dashboard.entity.QDashboard;
 import com.codeit.sb06deokhugamteam2.review.adapter.out.entity.QReview;
-import com.codeit.sb06deokhugamteam2.review.adapter.out.entity.QReviewLike;
+import com.codeit.sb06deokhugamteam2.like.adapter.out.entity.QReviewLike;
 import com.codeit.sb06deokhugamteam2.user.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
@@ -23,7 +23,6 @@ import org.springframework.data.domain.Sort;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -102,13 +101,15 @@ public class DashboardRepositoryImpl implements DashboardRepositoryCustom {
                         ))
                         .from(dashboard)
                         .innerJoin(review)
-                        .on(review.id.eq(dashboard.entityId))
+                        .on(review.id.eq(dashboard.entityId).and(review.deleted.isFalse()))
                         .leftJoin(comment)
                         .on(comment.review.eq(review).and(comment.createdAt.between(startDate, endDate)))
-                        .leftJoin(review.likes, reviewLike)
-                        .on(reviewLike.likedAt.between(startDate, endDate))
-                        .leftJoin(review.book, book)
-                        .leftJoin(review.user, user)
+                        .leftJoin(reviewLike)
+                        .on(reviewLike.review.eq(review).and(reviewLike.likedAt.between(startDate, endDate)))
+                        .innerJoin(review.book, book)
+                        .on(book.deleted.isFalse())
+                        .innerJoin(review.user, user)
+                        .on(user.deletedAt.isNull())
                         .where(dashboard.periodType.eq(periodType).and(dashboard.createdAt.between(startDate, endDate)))
                         .groupBy(dashboard.id, review.id, user.id, book.id)
                         .orderBy(primaryOrder, secondaryOrder)
@@ -117,7 +118,7 @@ public class DashboardRepositoryImpl implements DashboardRepositoryCustom {
 
         boolean hasNext = popularReviewDtos.size() > limit;
         if (hasNext) {
-            popularReviewDtos.remove(limit + 1);
+            popularReviewDtos.remove(popularReviewDtos.size() - 1);
         }
 
         return new SliceImpl<>(popularReviewDtos, Pageable.unpaged(), hasNext);
