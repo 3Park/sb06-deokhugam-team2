@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -142,6 +143,15 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
       DataIntegrityViolationException ex) {
+    ErrorResponse error = createErrorResponse(ex, HttpStatus.CONFLICT, Map.of());
+    return ResponseEntity.status(error.getStatus()).body(error);
+  }
+
+  // 409 낙관적 락 오류
+  @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+  public ResponseEntity<ErrorResponse> handleOptimisticLockingFailure(
+      ObjectOptimisticLockingFailureException ex) {
+    log.error(ex.getMessage(), ex);
     ErrorResponse error = createErrorResponse(ex, HttpStatus.CONFLICT, Map.of());
     return ResponseEntity.status(error.getStatus()).body(error);
   }

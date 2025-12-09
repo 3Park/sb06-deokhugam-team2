@@ -55,6 +55,9 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp'
 
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
     implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.12.1'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

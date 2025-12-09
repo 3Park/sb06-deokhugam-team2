@@ -17,6 +17,7 @@ import com.codeit.sb06deokhugamteam2.user.entity.User;
 import com.codeit.sb06deokhugamteam2.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -55,28 +56,21 @@ public class CommentService {
                 .orElseThrow(() -> new CommentException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId), HttpStatus.NOT_FOUND));
 
         Review review = em.getReference(Review.class, reviewId);
-
-
         Comment comment = Comment.builder()
                 .user(user)
                 .review(review)
                 .content(request.content())
                 .build();
 
+        SetReviewCount(reviewId,1);
+
         Comment savedComment = commentRepository.save(comment);
 
         String commenterNickname = user.getNickname();
 
-        //댓글 등록시 알림 보내기
         String notificationContent =
                 "[" + commenterNickname + "]님이 나의 리뷰에 댓글을 남겼습니다.\n" +
                         request.content();
-
-        //댓글 등록시 commentCount증가
-        ReviewStat stat = em.find(ReviewStat.class, reviewId);
-        if (stat != null) {
-            stat.commentCount(stat.commentCount() + 1);
-        }
 
         NotificationCreateRequest req = new NotificationCreateRequest(
                 review.user().getId(),
@@ -205,12 +199,12 @@ public class CommentService {
             );
         }
 
-        commentRepository.softDeleteById(commentId);
+        if(foundComment.getReview() == null)
+          new CommentException(ErrorCode.INVALID_DATA, Map.of("commentId", commentId,"message","review does not exsist"), HttpStatus.NOT_FOUND);
 
-        ReviewStat stat = em.find(ReviewStat.class, foundComment.getReview().id());
-        if (stat != null) {
-            stat.commentCount(stat.commentCount() - 1);
-        }
+        SetReviewCount(foundComment.getReview().id(),-1);
+
+        commentRepository.delete(foundComment);
     }
 
     public void hardDelete(UUID commentId, UUID userId) {
@@ -228,13 +222,6 @@ public class CommentService {
         }
 
         commentRepository.hardDeleteById(commentId);
-
-        if (!foundComment.getDeleted()) {
-            ReviewStat stat = em.find(ReviewStat.class, foundComment.getReview().id());
-            if (stat != null) {
-                stat.commentCount(stat.commentCount() - 1);
-            }
-        }
     }
 
 
@@ -249,6 +236,24 @@ public class CommentService {
         if (raw == null) return null;
         try { return Instant.parse(raw); }
         catch (Exception e) { return null; }
+    }
+
+    private void SetReviewCount(UUID reviewId, int incrementCount) {
+
+      if(reviewId == null)
+        new CommentException(ErrorCode.EMPTY_DATA, Map.of("reviewId", "not present"), HttpStatus.BAD_REQUEST);
+
+      ReviewStat reviewStat = em.getReference(ReviewStat.class, reviewId);
+
+      if(reviewStat == null)
+        new CommentException(ErrorCode.INVALID_DATA, Map.of("reviewId", reviewId,"reviewStat","not found"), HttpStatus.NOT_FOUND);
+
+      int current = reviewStat.commentCount();
+      if(current <= 0 && incrementCount < 0)
+        return;
+
+      reviewStat.commentCount(current + incrementCount);
+      em.persist(reviewStat);
     }
 
 }
