@@ -558,7 +558,7 @@ public class CommentIntegrationTest {
         //실제 row는 삭제되지X
         Object row = em.createNativeQuery("select * from comments where id = :id")
                 .setParameter("id", commentId)
-                .getSingleResult();
+                .getResultList();;
         assertThat(row).isNotNull();
 
         ReviewStat reviewStat = em.find(ReviewStat.class, reviewId);

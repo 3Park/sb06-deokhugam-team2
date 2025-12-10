@@ -49,9 +49,6 @@ public class Comment {
     @LastModifiedDate
     private Instant updatedAt;
 
-    @Column(nullable = false)
-    private boolean deleted;
-
     @Builder
     public Comment(User user, Review review, String content) {
         this.user = user;
