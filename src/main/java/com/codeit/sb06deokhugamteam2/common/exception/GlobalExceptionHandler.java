@@ -23,19 +23,24 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @Slf4j
 @RestControllerAdvice
-@ResponseBody
 public class GlobalExceptionHandler {
 
 //<editor-fold desc="커스텀 예외처리 부분들">
 
+  @ExceptionHandler(UserException.class)
+  public ResponseEntity<ErrorResponse> handleUserExceptionHandler(UserException ex) {
+    ErrorResponse error = createErrorResponse(ex, ex.getHttpStatus(), ex.getDetails());
+    return ResponseEntity.status(error.getStatus()).body(error);
+  }
+
   @ExceptionHandler(MDCException.class)
-  public ResponseEntity<ErrorResponse> MDCExceptionHandler(MDCException ex) {
+  public ResponseEntity<ErrorResponse> handleMDCExceptionHandler(MDCException ex) {
     ErrorResponse error = createErrorResponse(ex, ex.getHttpStatus(), ex.getDetails());
     return ResponseEntity.status(error.getStatus()).body(error);
   }
 
   @ExceptionHandler(NotificationException.class)
-  public ResponseEntity<ErrorResponse> MDCExceptionHandler(NotificationException ex) {
+  public ResponseEntity<ErrorResponse> handleNotificationExceptionHandler(NotificationException ex) {
     ErrorResponse error = createErrorResponse(ex, ex.getHttpStatus(), ex.getDetails());
     return ResponseEntity.status(error.getStatus()).body(error);
   }
