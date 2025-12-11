@@ -1,5 +1,6 @@
 # 2팀
-(팀 협업 문서 링크 게시)
+- [GitHub Issue](https://github.com/codeit-team2-intermediate-project/sb06-deokhugam-team2/issues)
+- [Github Project](https://github.com/orgs/codeit-team2-intermediate-project/projects/4/views/4)
 
 ## 팀원 구성
 - 이진우 ([Github 링크](https://github.com/jionu102))
