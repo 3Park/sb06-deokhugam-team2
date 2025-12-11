@@ -19,8 +19,8 @@ public class NaverSearchClient {
     private final String clientSecret;
 
     public NaverSearchClient(RestTemplate restTemplate,
-                             @Value("${spring.naver.client-id}") String clientId,
-                             @Value("${spring.naver.client-secret}") String clientSecret) {
+                             @Value("${deokhugam.naver.client-id}") String clientId,
+                             @Value("${deokhugam.naver.client-secret}") String clientSecret) {
         this.restTemplate = restTemplate;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
